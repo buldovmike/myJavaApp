@@ -1,0 +1,5 @@
+{
+  "DB_USER": "student",
+  "DB_PASSWORD": "student",
+  "DB_CONN_STRING": "jdbc:mysql://localhost:3306/student?useUnicode\u003dtrue\u0026serverTimezone\u003dUTC\u0026useSSL\u003dfalse"
+}

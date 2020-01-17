@@ -27,10 +27,16 @@ import ru.nnov.nntc.mbuldov.java.mysql.appdb.Student;
  */
 public class MasterForm extends javax.swing.JFrame {
 
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJavaAppPU");
+    public EntityManager em;
+    
     // Диалоги, вызываемые из главной формы
     private final AboutJDialog aboutDlg = new AboutJDialog(this, rootPaneCheckingEnabled);
     private final SettingsJDialog settDialog = new SettingsJDialog(this, rootPaneCheckingEnabled);
- 
+    
+    //Дополнительные формы, вызываемые из главной формы
+    private final StudentsForm studForm = new StudentsForm();
+    
     // Подключение к базе данных
     public static Connection conn = null;
     
@@ -40,6 +46,10 @@ public class MasterForm extends javax.swing.JFrame {
     public MasterForm() {
         initComponents();
         setLocationRelativeTo(null); // позиционировать форму по центу экрана
+        
+        
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJavaAppPU");
+        EntityManager em = emf.createEntityManager();
     }
 
     /**
@@ -53,6 +63,7 @@ public class MasterForm extends javax.swing.JFrame {
 
         menuBar = new javax.swing.JMenuBar();
         mainMenu = new javax.swing.JMenu();
+        openStudFormMenuitem = new javax.swing.JMenuItem();
         importStudMenuItem = new javax.swing.JMenuItem();
         importLectMenuItem = new javax.swing.JMenuItem();
         exportMenuItem = new javax.swing.JMenuItem();
@@ -76,6 +87,15 @@ public class MasterForm extends javax.swing.JFrame {
 
         mainMenu.setMnemonic('f');
         mainMenu.setText("Меню");
+
+        openStudFormMenuitem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        openStudFormMenuitem.setText("Студенты");
+        openStudFormMenuitem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openStudFormMenuitemActionPerformed(evt);
+            }
+        });
+        mainMenu.add(openStudFormMenuitem);
 
         importStudMenuItem.setMnemonic('o');
         importStudMenuItem.setText("Импорт студентов");
@@ -311,6 +331,10 @@ public class MasterForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_importLectMenuItemActionPerformed
 
+    private void openStudFormMenuitemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openStudFormMenuitemActionPerformed
+        studForm.setVisible(true);
+    }//GEN-LAST:event_openStudFormMenuitemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -358,6 +382,7 @@ public class MasterForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem importStudMenuItem;
     private javax.swing.JMenu mainMenu;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem openStudFormMenuitem;
     private javax.swing.JMenuItem settingsMenuItem;
     // End of variables declaration//GEN-END:variables
 

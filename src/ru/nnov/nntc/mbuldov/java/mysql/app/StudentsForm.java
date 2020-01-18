@@ -5,6 +5,7 @@
  */
 package ru.nnov.nntc.mbuldov.java.mysql.app;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.swing.table.DefaultTableModel;
@@ -15,7 +16,10 @@ import javax.swing.table.DefaultTableModel;
  */
 public class StudentsForm extends javax.swing.JFrame {
     
-    private MasterForm parent;
+    private final MasterForm parent;
+    private final int pageSize = 3;
+    private int pageNumber = 1;
+    private int pagesCount;
     
     /**
      * Creates new form StudentsForm
@@ -40,6 +44,8 @@ public class StudentsForm extends javax.swing.JFrame {
         jBtnImport = new javax.swing.JButton();
         jBtnAdd = new javax.swing.JButton();
         jBtnExport = new javax.swing.JButton();
+        jTextFieldFilter = new javax.swing.JTextField();
+        jBtnFilter = new javax.swing.JButton();
         jPanelMid = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableStudents = new javax.swing.JTable();
@@ -69,6 +75,13 @@ public class StudentsForm extends javax.swing.JFrame {
 
         jBtnExport.setText("Экспорт");
 
+        jBtnFilter.setText("Фильтр");
+        jBtnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnFilterActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelTopLayout = new javax.swing.GroupLayout(jPanelTop);
         jPanelTop.setLayout(jPanelTopLayout);
         jPanelTopLayout.setHorizontalGroup(
@@ -80,16 +93,22 @@ public class StudentsForm extends javax.swing.JFrame {
                 .addComponent(jBtnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jBtnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextFieldFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jBtnFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanelTopLayout.setVerticalGroup(
             jPanelTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelTopLayout.createSequentialGroup()
+            .addGroup(jPanelTopLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jBtnImport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
-                    .addComponent(jBtnAdd, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jBtnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanelTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jBtnImport, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                    .addComponent(jBtnAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jBtnExport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextFieldFilter)
+                    .addComponent(jBtnFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -134,8 +153,18 @@ public class StudentsForm extends javax.swing.JFrame {
         jLabelPages.setText("1/15");
 
         jBtnBack.setText("Назад");
+        jBtnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnBackActionPerformed(evt);
+            }
+        });
 
         jBtnForw.setText("Вперед");
+        jBtnForw.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnForwActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelBottomLayout = new javax.swing.GroupLayout(jPanelBottom);
         jPanelBottom.setLayout(jPanelBottomLayout);
@@ -196,6 +225,24 @@ public class StudentsForm extends javax.swing.JFrame {
         refreshTable();
     }//GEN-LAST:event_formWindowActivated
 
+    private void jBtnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnFilterActionPerformed
+       refreshTable();
+    }//GEN-LAST:event_jBtnFilterActionPerformed
+
+    private void jBtnForwActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnForwActionPerformed
+      if((pageNumber + 1) <= pagesCount){
+          pageNumber++;
+      }
+      refreshTable();
+    }//GEN-LAST:event_jBtnForwActionPerformed
+
+    private void jBtnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnBackActionPerformed
+         if((pageNumber - 1) >= 1){
+          pageNumber--;
+      }
+      refreshTable();
+    }//GEN-LAST:event_jBtnBackActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -235,6 +282,7 @@ public class StudentsForm extends javax.swing.JFrame {
     private javax.swing.JButton jBtnAdd;
     private javax.swing.JButton jBtnBack;
     private javax.swing.JButton jBtnExport;
+    private javax.swing.JButton jBtnFilter;
     private javax.swing.JButton jBtnForw;
     private javax.swing.JButton jBtnImport;
     private javax.swing.JLabel jLabelPages;
@@ -243,6 +291,7 @@ public class StudentsForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelTop;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableStudents;
+    private javax.swing.JTextField jTextFieldFilter;
     // End of variables declaration//GEN-END:variables
 
 
@@ -260,20 +309,86 @@ public class StudentsForm extends javax.swing.JFrame {
          }
      }
         
+     
+     public static boolean isInteger(String s, int radix) {
+         if(s.isEmpty()) return false;
+         for(int i = 0; i < s.length(); i++){
+             if(i == 0 && s.charAt(i) == '-') {
+                 if(s.length() == 1) return false;
+                 else continue;
+             }
+             if(Character.digit(s.charAt(i), radix) < 0) return false;
+         }
+         return true;
+     }
+     
+     
+     
+     
     
     private void refreshTable(){
        
         DefaultTableModel model = (DefaultTableModel) jTableStudents.getModel();
-         
+        //Очистка
+        model.setRowCount(0);
+        
+        String filter = "";
+        
+        String userFilter = jTextFieldFilter.getText();
+        
+        if(userFilter.length()>0){
+            
+       List<String> filterParts = new ArrayList<String>();
+            
+       filter = filter + " WHERE";   
+       
+       if(isInteger(userFilter, 10)){
+           filterParts.add("id=" + userFilter);
+       }
+       
+       filterParts.add("surname LIKE '%" + userFilter + "%'");
+       filterParts.add("name LIKE '%" + userFilter + "%'");
+       
+       if(isInteger(userFilter, 10)){
+           filterParts.add("kurs=" + userFilter);
+       }
+       
+       String filterPartsString = String.join(" OR", filterParts);
+        
+        filter = filter + " WHERE " + filterPartsString;
+    }
+        
+        String limitOffset = "";
+//        
+//        if(limit > 0) {
+//            limitOffset = " LIMIT " + String.valueOf(limit) + "," + String.valueOf(offset);
+//        }
+        
         TypedQuery<Object[]> query = this.parent.em.createQuery(
-            "SELECT s.studentId id, s.SURNAME surname, s.NAME name, s.KURS kurs FROM Student s",
+            "SELECT s.studentId id, s.surname surname, s.name name, s.kurs kurs FROM Student s" + filter,
             Object[].class
             );
+        
+        if(pageSize>0){
+            int rowsAll = query.getResultList().size();
+            pagesCount = rowsAll/pageSize;
+            
+            if((pagesCount*pageSize))
+        }
+        
+        pagesCount = query.getResultList().size()/pageSize;
+        
+        jLabelPages.setText(String.valueOf(pageNumber) + "/" + String.valueOf(pagesCount));
+        
+        if(pageSize > 0){
+            query.setMaxResults(pageSize);
+            query.setFirstResult((pageNumber-1) * pageSize);
+        }
     
         List<Object[]> results = query.getResultList();
             
         for(Object[] result : results){
-              //  System.out.println("Зачн: " + result[0]);
+              
             Object rowData[] = new Object[4];
         
         rowData[0] = result[0];
@@ -285,7 +400,14 @@ public class StudentsForm extends javax.swing.JFrame {
     }
         
       jTableStudents.setModel(model);
-        
+      
+     // Включить сортировку данных по кликам в заголовки 
+      jTableStudents.setAutoCreateRowSorter(true);
+      
+      // Проверки на активность кнопок постраничного навигатора
+      
+      jBtnBack.setEnabled(!(pageNumber == 1));
+      jBtnForw.setEnabled(!(pageNumber == pagesCount));
           
     }
 

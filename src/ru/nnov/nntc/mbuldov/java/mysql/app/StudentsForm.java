@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.swing.table.DefaultTableModel;
-
+import javax.persistence.Query;
+import javax.swing.JTable;
+import ru.nnov.nntc.mbuldov.java.mysql.appdb.Student;
 /**
  *
  * @author student
@@ -17,11 +19,12 @@ import javax.swing.table.DefaultTableModel;
 
 public class StudentsForm extends javax.swing.JFrame {
     
-    private final MasterForm parent;
+    public final MasterForm parent;
     //private final int pageSize = 3;
     private int pageNumber = 1;
     private int pagesCount;
     
+    public Student selectedStudent = null;
     /**
      * Creates new form StudentsForm
      * @param parent
@@ -59,6 +62,11 @@ public class StudentsForm extends javax.swing.JFrame {
 
         setMinimumSize(new java.awt.Dimension(800, 600));
         setPreferredSize(new java.awt.Dimension(800, 600));
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -136,6 +144,11 @@ public class StudentsForm extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        jTableStudents.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableStudentsMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(jTableStudents);
@@ -232,7 +245,8 @@ public class StudentsForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-        // TODO add your handling code here:
+     StudentsCardForm studCardForm = new StudentsCardForm(this);
+     studCardForm.setVisible(true);  
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -256,6 +270,30 @@ public class StudentsForm extends javax.swing.JFrame {
       }
       refreshTable();
     }//GEN-LAST:event_jBtnBackActionPerformed
+
+    private void jTableStudentsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableStudentsMouseClicked
+       
+        if(evt.getClickCount() == 2){
+            
+           JTable table = (JTable) evt.getSource();
+           int row = table.rowAtPoint(evt.getPoint());
+           int id = (int) jTableStudents.getModel().getValueAt(row, 0);
+            
+           //System.out.println(id);
+           Query query = this.parent.em.createNamedQuery("Student.findByStudentId");
+           query.setParameter("studentId", id);
+           List<Student> resultList = query.getResultList();
+           selectedStudent = resultList.get(0);
+           
+           StudentsCardForm studCardForm = new StudentsCardForm(this);
+           studCardForm.setVisible(true);
+ 
+        }
+    }//GEN-LAST:event_jTableStudentsMouseClicked
+
+    private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
+        refreshTable();
+    }//GEN-LAST:event_formFocusGained
 
     /**
      * @param args the command line arguments
@@ -322,11 +360,7 @@ public class StudentsForm extends javax.swing.JFrame {
          }
          return true;
      }
-     
-     
-     
-     
-    
+
     private void refreshTable(){
        
         DefaultTableModel model = (DefaultTableModel) jTableStudents.getModel();
@@ -338,87 +372,83 @@ public class StudentsForm extends javax.swing.JFrame {
         String userFilter = jTextFieldFilter.getText();
         
         if(userFilter.length()>0){
+
+            List<String> filterParts = new ArrayList<String>();
             
-       List<String> filterParts = new ArrayList<String>();
+            if(isInteger(userFilter, 10)){
+                filterParts.add("id=" + userFilter);
+            }
             
-       filter = filter + " WHERE";   
-       
-       if(isInteger(userFilter, 10)){
-           filterParts.add("id=" + userFilter);
-       }
-       
-       filterParts.add("surname LIKE '%" + userFilter + "%'");
-       filterParts.add("name LIKE '%" + userFilter + "%'");
-       
-       if(isInteger(userFilter, 10)){
-           filterParts.add("kurs=" + userFilter);
-       }
-       
-       String filterPartsString = String.join(" OR ", filterParts);
-        
-        filter = filter + " WHERE " + filterPartsString;
-    }
-        
-//        String limitOffset = "";
-//        
-//        if(limit > 0) {
-//            limitOffset = " LIMIT " + String.valueOf(limit) + "," + String.valueOf(offset);
-//        }
+            filterParts.add("surname LIKE '%" + userFilter + "%'");
+            filterParts.add("name LIKE '%" + userFilter + "%'");
+            
+            if(isInteger(userFilter, 10)){
+                filterParts.add("kurs=" + userFilter);
+            }
+            
+            String filterPartsString = String.join(" OR ", filterParts);
+            
+            filter = filter + " WHERE " + filterPartsString;
+        }
         
         TypedQuery<Object[]> query = this.parent.em.createQuery(
-            "SELECT s.studentId id, s.surname surname, s.name name, s.kurs kurs FROM Student s" + filter,
-            Object[].class
-            );
+                "SELECT s.studentId id, s.surname surname, s.name name, s.kurs kurs FROM Student s" + filter,
+                Object[].class
+                );
         
-        if(!isInteger(jTextFieldPageSize.getText(),10)){
+        if(!isInteger(jTextFieldPageSize.getText(), 10)){
             jTextFieldPageSize.setText("5");
         } else {
             if(Integer.valueOf(jTextFieldPageSize.getText())<=0){
                 jTextFieldPageSize.setText("5");
             }
         }
-
-        if(Integer.valueOf(jTextFieldPageSize.getText()) > 0){
+        
+        if(Integer.valueOf(jTextFieldPageSize.getText())>0){
+            
             int rowsAll = query.getResultList().size();
             pagesCount = rowsAll/Integer.valueOf(jTextFieldPageSize.getText());
             
-            if((pagesCount*Integer.valueOf(jTextFieldPageSize.getText()))< rowsAll){
+            if((pagesCount*Integer.valueOf(jTextFieldPageSize.getText())) < rowsAll){
                 pagesCount++;
             }
             
             
             jLabelPages.setText(String.valueOf(pageNumber) + "/" + String.valueOf(pagesCount));
-         
-        }else{
+        } else {
             jLabelPages.setText("");
             jBtnBack.setEnabled(false);
             jBtnForw.setEnabled(false);
         }
+        
     
+        if(Integer.valueOf(jTextFieldPageSize.getText()) > 0){
+            query.setMaxResults(Integer.valueOf(jTextFieldPageSize.getText()));
+            query.setFirstResult((pageNumber-1) * Integer.valueOf(jTextFieldPageSize.getText()));
+        }
+        
         List<Object[]> results = query.getResultList();
-            
+        
         for(Object[] result : results){
-              
+            
             Object rowData[] = new Object[4];
         
-        rowData[0] = result[0];
-        rowData[1] = result[1];
-        rowData[2] = result[2];
-        rowData[3] = result[3];
+            rowData[0] = result[0];
+            rowData[1] = result[1];
+            rowData[2] = result[2];
+            rowData[3] = result[3];
+            
+            model.addRow(rowData);   
+        }
         
-        model.addRow(rowData);
-    }
+        jTableStudents.setModel(model);
         
-      jTableStudents.setModel(model);
-      
-     // Включить сортировку данных по кликам в заголовки 
-      jTableStudents.setAutoCreateRowSorter(true);
-      
-      // Проверки на активность кнопок постраничного навигатора
-      
-      jBtnBack.setEnabled(!(pageNumber == 1));
-      jBtnForw.setEnabled(!(pageNumber == pagesCount));
-          
+        // включить сортировку данных по кликам в зголовки
+        jTableStudents.setAutoCreateRowSorter(true);
+        
+        jBtnBack.setEnabled(!(pageNumber==1));
+        jBtnForw.setEnabled(!(pageNumber==pagesCount));
+         
     }
 
 }

@@ -60,8 +60,8 @@ public class StudentsForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jTextFieldPageSize = new javax.swing.JTextField();
 
-        setMinimumSize(new java.awt.Dimension(800, 600));
-        setPreferredSize(new java.awt.Dimension(800, 600));
+        setMinimumSize(new java.awt.Dimension(800, 613));
+        setResizable(false);
         addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 formFocusGained(evt);

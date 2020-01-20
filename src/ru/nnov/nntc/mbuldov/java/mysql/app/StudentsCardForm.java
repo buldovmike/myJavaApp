@@ -7,6 +7,7 @@ package ru.nnov.nntc.mbuldov.java.mysql.app;
 
 import ru.nnov.nntc.mbuldov.java.mysql.appdb.Student;
 import java.math.BigDecimal;
+import javax.swing.JOptionPane;
 
 
 /**
@@ -75,7 +76,6 @@ public class StudentsCardForm extends javax.swing.JFrame {
         jBtnDelete = new javax.swing.JButton();
         jBtnAdd = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(800, 600));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -107,6 +107,11 @@ public class StudentsCardForm extends javax.swing.JFrame {
         });
 
         jBtnDelete.setText("Удалить");
+        jBtnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDeleteActionPerformed(evt);
+            }
+        });
 
         jBtnAdd.setText("Создать");
         jBtnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -122,19 +127,18 @@ public class StudentsCardForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jTextFieldSurname)
-                                .addComponent(jTextFieldName)))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTextFieldStudentId, javax.swing.GroupLayout.PREFERRED_SIZE, 605, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextFieldSurname)
+                            .addComponent(jTextFieldName)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldStudentId, javax.swing.GroupLayout.PREFERRED_SIZE, 605, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(201, 201, 201))
@@ -198,7 +202,16 @@ public class StudentsCardForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditActionPerformed
-        // TODO add your handling code here:
+        Student stud = this.parent.parent.em.find(Student.class, this.parent.selectedStudent.getStudentId());
+        this.parent.parent.em.getTransaction().begin();
+        stud.setStudentId(Integer.valueOf(jTextFieldStudentId.getText()));
+        stud.setName(jTextFieldName.getText());
+        stud.setSurname(jTextFieldSurname.getText());
+        stud.setStipend(BigDecimal.valueOf(Double.valueOf(jTextFieldStipend.getText())));
+        stud.setKurs(Integer.parseInt(jTextFieldKurs.getText()));
+        stud.setCity(jTextFieldCity.getText());
+        this.parent.parent.em.getTransaction().commit();
+        setVisible(false);
     }//GEN-LAST:event_jBtnEditActionPerformed
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
@@ -219,6 +232,17 @@ public class StudentsCardForm extends javax.swing.JFrame {
         this.parent.selectedStudent = null;
     }//GEN-LAST:event_formWindowClosing
 
+    private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
+        // реализуем диалог подтверждения удаления записи
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Удалить запись с номером " + this.parent.selectedStudent.getStudentId().toString() + "?", "Удалить", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            Student stud = this.parent.parent.em.find(Student.class, this.parent.selectedStudent.getStudentId());
+            this.parent.parent.em.getTransaction().begin();
+            this.parent.parent.em.remove(stud);
+            this.parent.parent.em.getTransaction().commit();
+            setVisible(false);
+        }
+    }//GEN-LAST:event_jBtnDeleteActionPerformed
     /**
      * @param args the command line arguments
      */

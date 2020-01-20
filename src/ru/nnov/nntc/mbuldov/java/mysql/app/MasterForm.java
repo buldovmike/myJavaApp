@@ -35,7 +35,7 @@ public class MasterForm extends javax.swing.JFrame {
     private final SettingsJDialog settDialog = new SettingsJDialog(this, rootPaneCheckingEnabled);
     
     //Дополнительные формы, вызываемые из главной формы
-    private final StudentsForm studForm = new StudentsForm();
+    private final StudentsForm studForm = new StudentsForm(this);
     
     // Подключение к базе данных
     public static Connection conn = null;
@@ -43,13 +43,10 @@ public class MasterForm extends javax.swing.JFrame {
     /**
      * Creates new form MasterForm
      */
+    
     public MasterForm() {
         initComponents();
         setLocationRelativeTo(null); // позиционировать форму по центу экрана
-        
-        
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJavaAppPU");
-        EntityManager em = emf.createEntityManager();
     }
 
     /**
@@ -174,7 +171,6 @@ public class MasterForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-        //System.exit(0);
         formWindowClosing(null);
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
@@ -193,7 +189,7 @@ public class MasterForm extends javax.swing.JFrame {
     private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
         
         if(isConnSucess()){
-            // подключение успешно - работаем дальше
+            // подключение успешно
             System.out.println("Успешное подключение к бд");
         } else {
             settDialog.setVisible(true);
@@ -212,7 +208,7 @@ public class MasterForm extends javax.swing.JFrame {
         int SUCCESS_SELECTED_FILE = 0;
         
         if (SUCCESS_SELECTED_FILE == fopenResult) {
-            // пользователь выбрал файл - парсим...
+            // пользователь выбрал файл(парсим)
             Csv.Reader reader = null;
 
             try {
@@ -395,6 +391,7 @@ public class MasterForm extends javax.swing.JFrame {
         
         try {
                     conn = DriverManager.getConnection(DB_CONN_STRING, DB_USER, DB_PASSWORD);
+                    this.em = this.emf.createEntityManager();
                     System.out.println("Connected");
                     return true;
                 } catch (SQLException e){

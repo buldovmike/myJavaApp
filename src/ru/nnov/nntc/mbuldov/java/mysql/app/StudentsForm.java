@@ -14,10 +14,11 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author student
  */
+
 public class StudentsForm extends javax.swing.JFrame {
     
     private final MasterForm parent;
-    private final int pageSize = 3;
+    //private final int pageSize = 3;
     private int pageNumber = 1;
     private int pagesCount;
     
@@ -53,6 +54,8 @@ public class StudentsForm extends javax.swing.JFrame {
         jLabelPages = new javax.swing.JLabel();
         jBtnBack = new javax.swing.JButton();
         jBtnForw = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jTextFieldPageSize = new javax.swing.JTextField();
 
         setMinimumSize(new java.awt.Dimension(800, 600));
         setPreferredSize(new java.awt.Dimension(800, 600));
@@ -96,7 +99,7 @@ public class StudentsForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTextFieldFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jBtnFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBtnFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanelTopLayout.setVerticalGroup(
@@ -166,18 +169,27 @@ public class StudentsForm extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("Кол-во страниц");
+
+        jTextFieldPageSize.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextFieldPageSize.setText("5");
+
         javax.swing.GroupLayout jPanelBottomLayout = new javax.swing.GroupLayout(jPanelBottom);
         jPanelBottom.setLayout(jPanelBottomLayout);
         jPanelBottomLayout.setHorizontalGroup(
             jPanelBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelBottomLayout.createSequentialGroup()
-                .addGap(287, 287, 287)
+                .addGap(251, 251, 251)
                 .addComponent(jBtnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelPages)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextFieldPageSize, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jBtnForw)
-                .addContainerGap(292, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelBottomLayout.setVerticalGroup(
             jPanelBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -186,7 +198,9 @@ public class StudentsForm extends javax.swing.JFrame {
                 .addGroup(jPanelBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBtnBack)
                     .addComponent(jBtnForw)
-                    .addComponent(jLabelPages))
+                    .addComponent(jLabelPages)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldPageSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18))
         );
 
@@ -285,6 +299,7 @@ public class StudentsForm extends javax.swing.JFrame {
     private javax.swing.JButton jBtnFilter;
     private javax.swing.JButton jBtnForw;
     private javax.swing.JButton jBtnImport;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelPages;
     private javax.swing.JPanel jPanelBottom;
     private javax.swing.JPanel jPanelMid;
@@ -292,24 +307,10 @@ public class StudentsForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableStudents;
     private javax.swing.JTextField jTextFieldFilter;
+    private javax.swing.JTextField jTextFieldPageSize;
     // End of variables declaration//GEN-END:variables
 
-
-     public class Student {
-         public int id;
-         public String surname;
-         public String name;
-         public int kurs;
-         
-         public Student(int id, String surname, String name, int kurs){
-             this.id = id;
-             this.surname = surname;
-             this.name = name;
-             this.kurs = kurs;
-         }
-     }
-        
-     
+    
      public static boolean isInteger(String s, int radix) {
          if(s.isEmpty()) return false;
          for(int i = 0; i < s.length(); i++){
@@ -353,12 +354,12 @@ public class StudentsForm extends javax.swing.JFrame {
            filterParts.add("kurs=" + userFilter);
        }
        
-       String filterPartsString = String.join(" OR", filterParts);
+       String filterPartsString = String.join(" OR ", filterParts);
         
         filter = filter + " WHERE " + filterPartsString;
     }
         
-        String limitOffset = "";
+//        String limitOffset = "";
 //        
 //        if(limit > 0) {
 //            limitOffset = " LIMIT " + String.valueOf(limit) + "," + String.valueOf(offset);
@@ -369,20 +370,29 @@ public class StudentsForm extends javax.swing.JFrame {
             Object[].class
             );
         
-        if(pageSize>0){
-            int rowsAll = query.getResultList().size();
-            pagesCount = rowsAll/pageSize;
-            
-            if((pagesCount*pageSize))
+        if(!isInteger(jTextFieldPageSize.getText(),10)){
+            jTextFieldPageSize.setText("5");
+        } else {
+            if(Integer.valueOf(jTextFieldPageSize.getText())<=0){
+                jTextFieldPageSize.setText("5");
+            }
         }
-        
-        pagesCount = query.getResultList().size()/pageSize;
-        
-        jLabelPages.setText(String.valueOf(pageNumber) + "/" + String.valueOf(pagesCount));
-        
-        if(pageSize > 0){
-            query.setMaxResults(pageSize);
-            query.setFirstResult((pageNumber-1) * pageSize);
+
+        if(Integer.valueOf(jTextFieldPageSize.getText()) > 0){
+            int rowsAll = query.getResultList().size();
+            pagesCount = rowsAll/Integer.valueOf(jTextFieldPageSize.getText());
+            
+            if((pagesCount*Integer.valueOf(jTextFieldPageSize.getText()))< rowsAll){
+                pagesCount++;
+            }
+            
+            
+            jLabelPages.setText(String.valueOf(pageNumber) + "/" + String.valueOf(pagesCount));
+         
+        }else{
+            jLabelPages.setText("");
+            jBtnBack.setEnabled(false);
+            jBtnForw.setEnabled(false);
         }
     
         List<Object[]> results = query.getResultList();

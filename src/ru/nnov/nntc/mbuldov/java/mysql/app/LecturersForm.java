@@ -5,12 +5,24 @@
  */
 package ru.nnov.nntc.mbuldov.java.mysql.app;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.swing.table.DefaultTableModel;
 import javax.persistence.Query;
+import javax.swing.JFileChooser;
 import javax.swing.JTable;
+import javenue.csv.Csv;
 import ru.nnov.nntc.mbuldov.java.mysql.appdb.Lecturer;
 /**
  *
@@ -77,6 +89,11 @@ public class LecturersForm extends javax.swing.JFrame {
         jBtnImport.setText("Импорт");
         jBtnImport.setMaximumSize(new java.awt.Dimension(90, 30));
         jBtnImport.setMinimumSize(new java.awt.Dimension(90, 30));
+        jBtnImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnImportActionPerformed(evt);
+            }
+        });
 
         jBtnAdd.setText("Добавить");
         jBtnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -86,6 +103,11 @@ public class LecturersForm extends javax.swing.JFrame {
         });
 
         jBtnExport.setText("Экспорт");
+        jBtnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnExportActionPerformed(evt);
+            }
+        });
 
         jBtnFilter.setText("Фильтр");
         jBtnFilter.addActionListener(new java.awt.event.ActionListener() {
@@ -295,6 +317,110 @@ public class LecturersForm extends javax.swing.JFrame {
     private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
         refreshTable();
     }//GEN-LAST:event_formFocusGained
+
+    private void jBtnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnImportActionPerformed
+         // открываем диалог загрузки файла csv
+        JFileChooser fileopen = new JFileChooser();
+        int fopenResult = fileopen.showDialog(null, "Импорт преподавателей");
+        int SUCCESS_SELECTED_FILE = 0;
+        
+        if (SUCCESS_SELECTED_FILE == fopenResult) {
+            // пользователь выбрал файл - парсим...
+            Csv.Reader reader = null;
+
+            try {
+                reader = new Csv.Reader(new FileReader(fileopen.getSelectedFile()))
+                        .delimiter(',') // !!!
+                        .ignoreComments(true); // !!!
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(MasterForm.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+            
+            List<String> line;
+            List<String> importErrors = new ArrayList<String>();
+         
+            line=reader.readLine(); // считали первую строчку - чтобы она не была в итерациях цикла
+            
+            //проверка шапки
+            String F2 = "фамилия";
+            String F3 = "имя";
+            String F4 = "город";
+            
+            if (!(F2.equalsIgnoreCase(line.get(0)) 
+                    && F3.equalsIgnoreCase(line.get(1)) 
+                    && F4.equalsIgnoreCase(line.get(2)))) 
+                    {
+                
+                importErrors.add("Шапка не соответствует формату:\""
+                        .concat(F2.concat(",").concat(F3).concat(",").concat(F4)).concat("\""));
+                
+                ErrorsJDialog errDlg = new ErrorsJDialog(this, rootPaneCheckingEnabled);
+                errDlg.SetErrors("Ошибка импорта студентов:", importErrors);
+                errDlg.setVisible(true);
+                return;
+                
+            }
+            
+            
+            this.parent.em.getTransaction().begin();
+ 
+            while((line=reader.readLine())!=null){
+                
+                // распарсить список на отдельные значения и выполнить INSERT в базу данных
+                String surname = line.get(0);
+                String name = line.get(1);
+                String city = line.get(2);
+                
+                Lecturer lect = new Lecturer();
+               
+                lect.setSurname(surname);
+                lect.setName(name);
+                lect.setCity(city);
+                this.parent.em.persist(lect);
+                
+            }
+            
+             this.parent.em.getTransaction().commit();
+            
+
+        } else {
+            System.out.println("Пользователь не выбрал файл");
+        }
+    }//GEN-LAST:event_jBtnImportActionPerformed
+
+    private void jBtnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExportActionPerformed
+        
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File("~"));
+        
+        int retrival = chooser.showSaveDialog(null);
+        
+        if(retrival == JFileChooser.APPROVE_OPTION){
+            
+            try {
+                FileWriter fw = new FileWriter(chooser.getSelectedFile());
+                
+                Query query = this.parent.em.createNamedQuery("Lecturer.findAll");
+                List<Lecturer> resultList = query.getResultList();
+                
+                for(Lecturer result : resultList){
+                    List fieldsList = new ArrayList();
+                    fieldsList.add(result.getLecturerId().toString());
+                    fieldsList.add(result.getSurname());
+                    fieldsList.add(result.getName());
+                    fieldsList.add(result.getCity());
+                    fw.write(String.join(",", fieldsList)  + "\n");
+                }
+                
+                fw.close();
+                
+            } catch (IOException ex) {
+                Logger.getLogger(LecturersForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+    }//GEN-LAST:event_jBtnExportActionPerformed
 
     /**
      * @param args the command line arguments

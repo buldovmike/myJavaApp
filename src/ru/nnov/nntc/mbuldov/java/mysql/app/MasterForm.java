@@ -63,9 +63,6 @@ public class MasterForm extends javax.swing.JFrame {
         mainMenu = new javax.swing.JMenu();
         openStudFormMenuitem = new javax.swing.JMenuItem();
         openLectFormMenuitem = new javax.swing.JMenuItem();
-        importStudMenuItem = new javax.swing.JMenuItem();
-        importLectMenuItem = new javax.swing.JMenuItem();
-        exportMenuItem = new javax.swing.JMenuItem();
         settingsMenuItem = new javax.swing.JMenuItem();
         exitMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
@@ -104,29 +101,6 @@ public class MasterForm extends javax.swing.JFrame {
             }
         });
         mainMenu.add(openLectFormMenuitem);
-
-        importStudMenuItem.setMnemonic('o');
-        importStudMenuItem.setText("Импорт студентов");
-        importStudMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importStudMenuItemActionPerformed(evt);
-            }
-        });
-        mainMenu.add(importStudMenuItem);
-
-        importLectMenuItem.setMnemonic('o');
-        importLectMenuItem.setText("Импорт преподавателей");
-        importLectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importLectMenuItemActionPerformed(evt);
-            }
-        });
-        mainMenu.add(importLectMenuItem);
-
-        exportMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
-        exportMenuItem.setMnemonic('s');
-        exportMenuItem.setText("Экспорт");
-        mainMenu.add(exportMenuItem);
 
         settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         settingsMenuItem.setMnemonic('a');
@@ -212,132 +186,6 @@ public class MasterForm extends javax.swing.JFrame {
         settDialog.setVisible(true);
     }//GEN-LAST:event_settingsMenuItemActionPerformed
 
-    private void importStudMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importStudMenuItemActionPerformed
-        // открываем диалог загрузки файла csv
-        JFileChooser fileopen = new JFileChooser();
-        int fopenResult = fileopen.showDialog(null, "Импорт студентов");
-        int SUCCESS_SELECTED_FILE = 0;
-        
-        if (SUCCESS_SELECTED_FILE == fopenResult) {
-            // пользователь выбрал файл(парсим)
-            Csv.Reader reader = null;
-
-            try {
-                reader = new Csv.Reader(new FileReader(fileopen.getSelectedFile()))
-                        .delimiter(',') // !!!
-                        .ignoreComments(true); // !!!
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(MasterForm.class.getName()).log(Level.SEVERE, null, ex);
-                return;
-            }
-            
-            List<String> line;
-            List<String> importErrors = new ArrayList<String>();
-            
-            line=reader.readLine(); // считали первую строчку - чтобы она не была в итерациях цикла
-            
-            //проверка шапки
-            String F1 = "номер зачётки";
-            String F2 = "фамилия";
-            String F3 = "имя";
-            String F4 = "курс";
-            
-            if (!(F1.equalsIgnoreCase(line.get(0)) 
-                    && F2.equalsIgnoreCase(line.get(1)) 
-                    && F3.equalsIgnoreCase(line.get(2)) 
-                    && F4.equalsIgnoreCase(line.get(3)))){
-                
-                importErrors.add("Шапка не соответствует формату:\""
-                        .concat(F1.concat(",").concat(F2).concat(",").concat(F3).concat(",").concat(F4)).concat("\""));
-                
-                ErrorsJDialog errDlg = new ErrorsJDialog(this, rootPaneCheckingEnabled);
-                errDlg.SetErrors("Ошибка импорта студентов:", importErrors);
-                errDlg.setVisible(true);
-                return;
-                
-            }
-            
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJavaAppPU");
-            EntityManager em = emf.createEntityManager();
-            em.getTransaction().begin();
-            
-            while((line=reader.readLine())!=null){
-                
-                // распарсить список на отдельные значения и выполнить INSERT в базу данных
-                String num = line.get(0);
-                String surname = line.get(1);
-                String name = line.get(2);
-                String kurs = line.get(3);
-                
-                Student stud = new Student();
-                stud.setStudentId(Integer.parseInt(num));
-                stud.setName(name);
-                stud.setSurname(surname);
-                stud.setKurs(Integer.parseInt(kurs));
-                em.persist(stud);
-                
-            }
-            
-            em.getTransaction().commit();
-            
-
-        } else {
-            System.out.println("Пользователь не выбрал файл");
-        }
-        
-        
-    }//GEN-LAST:event_importStudMenuItemActionPerformed
-
-    private void importLectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importLectMenuItemActionPerformed
-        // открываем диалог загрузки файла csv
-        JFileChooser fileopen = new JFileChooser();
-        int fopenResult = fileopen.showDialog(null, "Импорт преподавателей");
-        int SUCCESS_SELECTED_FILE = 0;
-        
-        if (SUCCESS_SELECTED_FILE == fopenResult) {
-            // пользователь выбрал файл - парсим...
-            Csv.Reader reader = null;
-
-            try {
-                reader = new Csv.Reader(new FileReader(fileopen.getSelectedFile()))
-                        .delimiter(',') // !!!
-                        .ignoreComments(true); // !!!
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(MasterForm.class.getName()).log(Level.SEVERE, null, ex);
-                return;
-            }
-            
-            List<String> line;
-            
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJavaAppPU");
-            EntityManager em = emf.createEntityManager();
-            em.getTransaction().begin();
-            
-            line=reader.readLine(); // считали первую строчку - чтобы она не была в итерациях цикла
-            
-            while((line=reader.readLine())!=null){
-                
-                // распарсить список на отдельные значения и выполнить INSERT в базу данных
-                String surname = line.get(0);
-                String name = line.get(1);
-                String city = line.get(2);
-                
-                Lecturer lect = new Lecturer();
-                lect.setName(name);
-                lect.setSurname(surname);
-                lect.setCity(city);
-                em.persist(lect);
-                
-            }
-            
-            em.getTransaction().commit();
-            
-
-        } else {
-            System.out.println("Пользователь не выбрал файл");
-        }
-    }//GEN-LAST:event_importLectMenuItemActionPerformed
-
     private void openStudFormMenuitemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openStudFormMenuitemActionPerformed
         studForm.setVisible(true);
     }//GEN-LAST:event_openStudFormMenuitemActionPerformed
@@ -387,10 +235,7 @@ public class MasterForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
-    private javax.swing.JMenuItem exportMenuItem;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JMenuItem importLectMenuItem;
-    private javax.swing.JMenuItem importStudMenuItem;
     private javax.swing.JMenu mainMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openLectFormMenuitem;

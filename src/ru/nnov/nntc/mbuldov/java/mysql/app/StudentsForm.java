@@ -5,12 +5,21 @@
  */
 package ru.nnov.nntc.mbuldov.java.mysql.app;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.TypedQuery;
 import javax.swing.table.DefaultTableModel;
 import javax.persistence.Query;
+import javax.swing.JFileChooser;
 import javax.swing.JTable;
+import javenue.csv.Csv;
 import ru.nnov.nntc.mbuldov.java.mysql.appdb.Student;
 /**
  *
@@ -76,6 +85,11 @@ public class StudentsForm extends javax.swing.JFrame {
         jBtnImport.setText("Импорт");
         jBtnImport.setMaximumSize(new java.awt.Dimension(90, 30));
         jBtnImport.setMinimumSize(new java.awt.Dimension(90, 30));
+        jBtnImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnImportActionPerformed(evt);
+            }
+        });
 
         jBtnAdd.setText("Добавить");
         jBtnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -85,6 +99,11 @@ public class StudentsForm extends javax.swing.JFrame {
         });
 
         jBtnExport.setText("Экспорт");
+        jBtnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnExportActionPerformed(evt);
+            }
+        });
 
         jBtnFilter.setText("Фильтр");
         jBtnFilter.addActionListener(new java.awt.event.ActionListener() {
@@ -294,6 +313,113 @@ public class StudentsForm extends javax.swing.JFrame {
     private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
         refreshTable();
     }//GEN-LAST:event_formFocusGained
+
+    private void jBtnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExportActionPerformed
+     
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File("~"));
+
+        int retrival = chooser.showSaveDialog(null);
+
+        if (retrival == JFileChooser.APPROVE_OPTION) {
+
+            try {
+                FileWriter fw = new FileWriter(chooser.getSelectedFile());
+
+                Query query = this.parent.em.createNamedQuery("Student.findAll");
+                List<Student> resultList = query.getResultList();
+
+                for (Student result : resultList) {
+                    List fieldsList = new ArrayList();
+                    fieldsList.add(result.getStudentId().toString());
+                    fieldsList.add(result.getSurname());
+                    fieldsList.add(result.getName());
+                    fieldsList.add((result.getKurs() == null) ? "" : result.getKurs().toString());
+                    fieldsList.add((result.getStipend() == null) ? "" : result.getStipend().toString());
+                    fw.write(String.join(",", fieldsList) + "\n");
+                }
+
+                fw.close();
+
+            } catch (IOException ex) {
+                Logger.getLogger(StudentsForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+    }//GEN-LAST:event_jBtnExportActionPerformed
+
+    private void jBtnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnImportActionPerformed
+         // открываем диалог загрузки файла csv
+        JFileChooser fileopen = new JFileChooser();
+        int fopenResult = fileopen.showDialog(null, "Импорт студентов");
+        int SUCCESS_SELECTED_FILE = 0;
+        
+        if (SUCCESS_SELECTED_FILE == fopenResult) {
+            // пользователь выбрал файл - парсим...
+            Csv.Reader reader = null;
+
+            try {
+                reader = new Csv.Reader(new FileReader(fileopen.getSelectedFile()))
+                        .delimiter(',') // !!!
+                        .ignoreComments(true); // !!!
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(MasterForm.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+            
+            List<String> line;
+            List<String> importErrors = new ArrayList<String>();
+            
+            line=reader.readLine(); // считали первую строчку - чтобы она не была в итерациях цикла
+            
+            //проверка шапки
+            String F1 = "номер зачётки";
+            String F2 = "фамилия";
+            String F3 = "имя";
+            String F4 = "курс";
+            
+            if (!(F1.equalsIgnoreCase(line.get(0)) 
+                    && F2.equalsIgnoreCase(line.get(1)) 
+                    && F3.equalsIgnoreCase(line.get(2)) 
+                    && F4.equalsIgnoreCase(line.get(3)))){
+                
+                importErrors.add("Шапка не соответствует формату:\""
+                        .concat(F1.concat(",").concat(F2).concat(",").concat(F3).concat(",").concat(F4)).concat("\""));
+                
+                ErrorsJDialog errDlg = new ErrorsJDialog(this, rootPaneCheckingEnabled);
+                errDlg.SetErrors("Ошибка импорта студентов:", importErrors);
+                errDlg.setVisible(true);
+                return;
+                
+            }
+            
+            
+            this.parent.em.getTransaction().begin();
+            
+            while((line=reader.readLine())!=null){
+                
+                // распарсить список на отдельные значения и выполнить INSERT в базу данных
+                String num = line.get(0);
+                String surname = line.get(1);
+                String name = line.get(2);
+                String kurs = line.get(3);
+                
+                Student stud = new Student();
+                stud.setStudentId(Integer.parseInt(num));
+                stud.setName(name);
+                stud.setSurname(surname);
+                stud.setKurs(Integer.parseInt(kurs));
+                this.parent.em.persist(stud);
+                
+            }
+            
+            this.parent.em.getTransaction().commit();
+            
+
+        } else {
+            System.out.println("Пользователь не выбрал файл");
+        }
+    }//GEN-LAST:event_jBtnImportActionPerformed
 
     /**
      * @param args the command line arguments

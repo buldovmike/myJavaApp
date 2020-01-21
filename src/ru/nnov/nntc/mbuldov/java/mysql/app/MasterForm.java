@@ -36,6 +36,7 @@ public class MasterForm extends javax.swing.JFrame {
     
     //Дополнительные формы, вызываемые из главной формы
     private final StudentsForm studForm = new StudentsForm(this);
+    private final LecturersForm lectForm = new LecturersForm(this);
     
     // Подключение к базе данных
     public static Connection conn = null;
@@ -61,6 +62,7 @@ public class MasterForm extends javax.swing.JFrame {
         menuBar = new javax.swing.JMenuBar();
         mainMenu = new javax.swing.JMenu();
         openStudFormMenuitem = new javax.swing.JMenuItem();
+        openLectFormMenuitem = new javax.swing.JMenuItem();
         importStudMenuItem = new javax.swing.JMenuItem();
         importLectMenuItem = new javax.swing.JMenuItem();
         exportMenuItem = new javax.swing.JMenuItem();
@@ -93,6 +95,15 @@ public class MasterForm extends javax.swing.JFrame {
             }
         });
         mainMenu.add(openStudFormMenuitem);
+
+        openLectFormMenuitem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
+        openLectFormMenuitem.setText("Преподователи");
+        openLectFormMenuitem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openLectFormMenuitemActionPerformed(evt);
+            }
+        });
+        mainMenu.add(openLectFormMenuitem);
 
         importStudMenuItem.setMnemonic('o');
         importStudMenuItem.setText("Импорт студентов");
@@ -331,6 +342,10 @@ public class MasterForm extends javax.swing.JFrame {
         studForm.setVisible(true);
     }//GEN-LAST:event_openStudFormMenuitemActionPerformed
 
+    private void openLectFormMenuitemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openLectFormMenuitemActionPerformed
+       lectForm.setVisible(true);
+    }//GEN-LAST:event_openLectFormMenuitemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -378,6 +393,7 @@ public class MasterForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem importStudMenuItem;
     private javax.swing.JMenu mainMenu;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem openLectFormMenuitem;
     private javax.swing.JMenuItem openStudFormMenuitem;
     private javax.swing.JMenuItem settingsMenuItem;
     // End of variables declaration//GEN-END:variables

@@ -5,7 +5,7 @@
  */
 package ru.nnov.nntc.mbuldov.java.mysql.app;
 
-import ru.nnov.nntc.mbuldov.java.mysql.appdb.Student;
+import ru.nnov.nntc.mbuldov.java.mysql.appdb.Lecturer;
 import java.math.BigDecimal;
 import javax.swing.JOptionPane;
 
@@ -16,18 +16,18 @@ import javax.swing.JOptionPane;
  */
 public class LecturersCardForm extends javax.swing.JFrame {
        
-    private final StudentsForm parent;
+    private final LecturersForm parent;
 
     /**
-     * Creates new form StudentsCardForm
+     * Creates new form LecterersCardForm
      * @param parent
      */
-    public LecturersCardForm(StudentsForm parent) {
+    public LecturersCardForm(LecturersForm parent) {
         initComponents();
         setLocationRelativeTo(null);
         this.parent = parent;
         
-        if(null==this.parent.selectedStudent){
+        if(null==this.parent.selectedLecturer){
             jLabelTitle.setText("Создать");
             jBtnDelete.setVisible(false);
             jBtnEdit.setVisible(false);
@@ -38,14 +38,12 @@ public class LecturersCardForm extends javax.swing.JFrame {
             jBtnEdit.setVisible(true);
             jBtnAdd.setVisible(false);
             
-            jTextFieldStudentId.setText(this.parent.selectedStudent.getStudentId().toString());
-            jTextFieldSurname.setText(this.parent.selectedStudent.getSurname());
-            jTextFieldName.setText(this.parent.selectedStudent.getName());
+            jTextFieldLecturerId.setText(this.parent.selectedLecturer.getLecturerId().toString());
+            jTextFieldSurname.setText(this.parent.selectedLecturer.getSurname());
+            jTextFieldName.setText(this.parent.selectedLecturer.getName());
             
            
-            jTextFieldStipend.setText( (this.parent.selectedStudent.getStipend()!=null) ? this.parent.selectedStudent.getStipend().toString() : "" );
-            jTextFieldKurs.setText((this.parent.selectedStudent.getKurs()!=null) ? this.parent.selectedStudent.getKurs().toString() : "" );
-            jTextFieldCity.setText((this.parent.selectedStudent.getCity()!=null) ? this.parent.selectedStudent.getCity().toString() : "" );
+            jTextFieldCity.setText((this.parent.selectedLecturer.getCity()!=null) ? this.parent.selectedLecturer.getCity().toString() : "" );
             
         }      
     }
@@ -61,7 +59,7 @@ public class LecturersCardForm extends javax.swing.JFrame {
 
         jLabelTitle = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jTextFieldStudentId = new javax.swing.JTextField();
+        jTextFieldLecturerId = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jTextFieldSurname = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -129,7 +127,7 @@ public class LecturersCardForm extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldStudentId, javax.swing.GroupLayout.PREFERRED_SIZE, 605, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jTextFieldLecturerId, javax.swing.GroupLayout.PREFERRED_SIZE, 605, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(201, 201, 201))
@@ -153,7 +151,7 @@ public class LecturersCardForm extends javax.swing.JFrame {
                 .addComponent(jLabelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextFieldStudentId, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                    .addComponent(jTextFieldLecturerId, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -179,43 +177,39 @@ public class LecturersCardForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditActionPerformed
-        Student stud = this.parent.parent.em.find(Student.class, this.parent.selectedStudent.getStudentId());
+        Lecturer lect = this.parent.parent.em.find(Lecturer.class, this.parent.selectedLecturer.getLecturerId());
         this.parent.parent.em.getTransaction().begin();
-        stud.setStudentId(Integer.valueOf(jTextFieldStudentId.getText()));
-        stud.setName(jTextFieldName.getText());
-        stud.setSurname(jTextFieldSurname.getText());
-        stud.setStipend(BigDecimal.valueOf(Double.valueOf(jTextFieldStipend.getText())));
-        stud.setKurs(Integer.parseInt(jTextFieldKurs.getText()));
-        stud.setCity(jTextFieldCity.getText());
+        lect.setLecturerId(Integer.valueOf(jTextFieldLecturerId.getText()));
+        lect.setName(jTextFieldName.getText());
+        lect.setSurname(jTextFieldSurname.getText());
+        lect.setCity(jTextFieldCity.getText());
         this.parent.parent.em.getTransaction().commit();
         setVisible(false);
     }//GEN-LAST:event_jBtnEditActionPerformed
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
         this.parent.parent.em.getTransaction().begin();
-        Student stud = new Student();
-        stud.setStudentId(Integer.valueOf(jTextFieldStudentId.getText()));
-        stud.setName(jTextFieldName.getText());
-        stud.setSurname(jTextFieldSurname.getText());
-        stud.setStipend(BigDecimal.valueOf(Double.valueOf(jTextFieldStipend.getText())));
-        stud.setKurs(Integer.parseInt(jTextFieldKurs.getText()));
-        stud.setCity(jTextFieldCity.getText());
-        this.parent.parent.em.persist(stud);
+        Lecturer lect = new Lecturer();
+        lect.setLecturerId(Integer.valueOf(jTextFieldLecturerId.getText()));
+        lect.setName(jTextFieldName.getText());
+        lect.setSurname(jTextFieldSurname.getText());
+        lect.setCity(jTextFieldCity.getText());
+        this.parent.parent.em.persist(lect);
         this.parent.parent.em.getTransaction().commit();
         setVisible(false);
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        this.parent.selectedStudent = null;
+        this.parent.selectedLecturer = null;
     }//GEN-LAST:event_formWindowClosing
 
     private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
         // реализуем диалог подтверждения удаления записи
-        int dialogResult = JOptionPane.showConfirmDialog(null, "Удалить запись с номером " + this.parent.selectedStudent.getStudentId().toString() + "?", "Удалить", JOptionPane.YES_NO_OPTION);
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Удалить запись с номером " + this.parent.selectedLecturer.getLecturerId().toString() + "?", "Удалить", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
-            Student stud = this.parent.parent.em.find(Student.class, this.parent.selectedStudent.getStudentId());
+            Lecturer lect = this.parent.parent.em.find(Lecturer.class, this.parent.selectedLecturer.getLecturerId());
             this.parent.parent.em.getTransaction().begin();
-            this.parent.parent.em.remove(stud);
+            this.parent.parent.em.remove(lect);
             this.parent.parent.em.getTransaction().commit();
             setVisible(false);
         }
@@ -266,8 +260,8 @@ public class LecturersCardForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabelTitle;
     private javax.swing.JTextField jTextFieldCity;
+    private javax.swing.JTextField jTextFieldLecturerId;
     private javax.swing.JTextField jTextFieldName;
-    private javax.swing.JTextField jTextFieldStudentId;
     private javax.swing.JTextField jTextFieldSurname;
     // End of variables declaration//GEN-END:variables
 

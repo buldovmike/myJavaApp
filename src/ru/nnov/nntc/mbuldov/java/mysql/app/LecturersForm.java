@@ -24,9 +24,10 @@ public class LecturersForm extends javax.swing.JFrame {
     private int pageNumber = 1;
     private int pagesCount;
     
+    public Lecturer selectedLecturer = null;
    
     /**
-     * Creates new form StudentsForm
+     * Creates new form LecturersForm
      * @param parent
      */
     public LecturersForm(MasterForm parent) {
@@ -52,7 +53,7 @@ public class LecturersForm extends javax.swing.JFrame {
         jBtnFilter = new javax.swing.JButton();
         jPanelMid = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTableStudents = new javax.swing.JTable();
+        jTableLecturers = new javax.swing.JTable();
         jPanelBottom = new javax.swing.JPanel();
         jLabelPages = new javax.swing.JLabel();
         jBtnBack = new javax.swing.JButton();
@@ -123,12 +124,12 @@ public class LecturersForm extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTableStudents.setModel(new javax.swing.table.DefaultTableModel(
+        jTableLecturers.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "№ зачётки", "Фамилия", "Имя", "Курс"
+                "№ преподователя", "Фамилия", "Имя", "Город"
             }
         ) {
             Class[] types = new Class [] {
@@ -146,12 +147,12 @@ public class LecturersForm extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jTableStudents.addMouseListener(new java.awt.event.MouseAdapter() {
+        jTableLecturers.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTableStudentsMouseClicked(evt);
+                jTableLecturersMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(jTableStudents);
+        jScrollPane1.setViewportView(jTableLecturers);
 
         javax.swing.GroupLayout jPanelMidLayout = new javax.swing.GroupLayout(jPanelMid);
         jPanelMid.setLayout(jPanelMidLayout);
@@ -245,8 +246,8 @@ public class LecturersForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-     StudentsCardForm studCardForm = new StudentsCardForm(this);
-     studCardForm.setVisible(true);  
+     LecturersCardForm lectCardForm = new LecturersCardForm(this);
+     lectCardForm.setVisible(true);  
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -271,25 +272,25 @@ public class LecturersForm extends javax.swing.JFrame {
       refreshTable();
     }//GEN-LAST:event_jBtnBackActionPerformed
 
-    private void jTableStudentsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableStudentsMouseClicked
+    private void jTableLecturersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableLecturersMouseClicked
        
         if(evt.getClickCount() == 2){
             
            JTable table = (JTable) evt.getSource();
            int row = table.rowAtPoint(evt.getPoint());
-           int id = (int) jTableStudents.getModel().getValueAt(row, 0);
+           int id = (int) jTableLecturers.getModel().getValueAt(row, 0);
             
            //System.out.println(id);
-           Query query = this.parent.em.createNamedQuery("Student.findByStudentId");
-           query.setParameter("studentId", id);
-           List<Student> resultList = query.getResultList();
-           selectedStudent = resultList.get(0);
+           Query query = this.parent.em.createNamedQuery("Lecturer.findByLecturerId");
+           query.setParameter("lecturerId", id);
+           List<Lecturer> resultList = query.getResultList();
+           selectedLecturer = resultList.get(0);
            
-           StudentsCardForm studCardForm = new StudentsCardForm(this);
-           studCardForm.setVisible(true);
+           LecturersCardForm lectCardForm = new LecturersCardForm(this);
+           lectCardForm.setVisible(true);
  
         }
-    }//GEN-LAST:event_jTableStudentsMouseClicked
+    }//GEN-LAST:event_jTableLecturersMouseClicked
 
     private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
         refreshTable();
@@ -344,7 +345,7 @@ public class LecturersForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelMid;
     private javax.swing.JPanel jPanelTop;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTableStudents;
+    private javax.swing.JTable jTableLecturers;
     private javax.swing.JTextField jTextFieldFilter;
     private javax.swing.JTextField jTextFieldPageSize;
     // End of variables declaration//GEN-END:variables
@@ -364,7 +365,7 @@ public class LecturersForm extends javax.swing.JFrame {
 
     private void refreshTable(){
        
-        DefaultTableModel model = (DefaultTableModel) jTableStudents.getModel();
+        DefaultTableModel model = (DefaultTableModel) jTableLecturers.getModel();
         //Очистка
         model.setRowCount(0);
         
@@ -382,10 +383,11 @@ public class LecturersForm extends javax.swing.JFrame {
             
             filterParts.add("surname LIKE '%" + userFilter + "%'");
             filterParts.add("name LIKE '%" + userFilter + "%'");
+            filterParts.add("city LIKE '%" + userFilter + "%'");
             
-            if(isInteger(userFilter, 10)){
-                filterParts.add("kurs=" + userFilter);
-            }
+//            if(isInteger(userFilter, 10)){
+//                filterParts.add("city=" + userFilter);
+//            }
             
             String filterPartsString = String.join(" OR ", filterParts);
             
@@ -393,7 +395,7 @@ public class LecturersForm extends javax.swing.JFrame {
         }
         
         TypedQuery<Object[]> query = this.parent.em.createQuery(
-                "SELECT s.studentId id, s.surname surname, s.name name, s.kurs kurs FROM Student s" + filter,
+                "SELECT l.lecturerId id, l.surname surname, l.name name, l.city city FROM Lecturer l" + filter,
                 Object[].class
                 );
         
@@ -442,10 +444,10 @@ public class LecturersForm extends javax.swing.JFrame {
             model.addRow(rowData);   
         }
         
-        jTableStudents.setModel(model);
+        jTableLecturers.setModel(model);
         
         // включить сортировку данных по кликам в зголовки
-        jTableStudents.setAutoCreateRowSorter(true);
+        jTableLecturers.setAutoCreateRowSorter(true);
         
         jBtnBack.setEnabled(!(pageNumber==1));
         jBtnForw.setEnabled(!(pageNumber==pagesCount));

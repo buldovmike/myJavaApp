@@ -40,7 +40,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel1" min="-2" pref="110" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jTextFieldStudentId" min="-2" pref="605" max="-2" attributes="0"/>
+                      <Component id="jTextFieldLecturerId" min="-2" pref="605" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="jLabelTitle" min="-2" pref="328" max="-2" attributes="0"/>
@@ -71,7 +71,7 @@
               <Component id="jLabelTitle" min="-2" pref="42" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="jTextFieldStudentId" pref="40" max="32767" attributes="0"/>
+                  <Component id="jTextFieldLecturerId" pref="40" max="32767" attributes="0"/>
                   <Component id="jLabel1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -115,7 +115,7 @@
         <Property name="text" type="java.lang.String" value="&#x2116; &#x43f;&#x440;&#x435;&#x43f;&#x43e;&#x434;&#x43e;&#x432;&#x430;&#x442;&#x435;&#x43b;&#x44f;:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextFieldStudentId">
+    <Component class="javax.swing.JTextField" name="jTextFieldLecturerId">
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>

@@ -201,7 +201,7 @@ public class StudentsForm extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("Кол-во строк ");
+        jLabel1.setText("Кол-во страниц");
 
         jTextFieldPageSize.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextFieldPageSize.setText("5");
@@ -211,17 +211,17 @@ public class StudentsForm extends javax.swing.JFrame {
         jPanelBottomLayout.setHorizontalGroup(
             jPanelBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelBottomLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(251, 251, 251)
                 .addComponent(jBtnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelPages)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnForw)
-                .addGap(105, 105, 105)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextFieldPageSize, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jBtnForw)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelBottomLayout.setVerticalGroup(
             jPanelBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -366,10 +366,7 @@ public class StudentsForm extends javax.swing.JFrame {
                 Logger.getLogger(MasterForm.class.getName()).log(Level.SEVERE, null, ex);
                 return;
             }
-             
-//            FileNameExtensionFilter filter = new FileNameExtensionFilter("Exel", "csv");
-//            fileopen.addChoosableFileFilter(filter);
-
+            
             List<String> line;
             List<String> importErrors = new ArrayList<String>();
             
@@ -579,7 +576,7 @@ public class StudentsForm extends javax.swing.JFrame {
         jBtnForw.setEnabled(!(pageNumber==pagesCount));
          
     }
-    
+
 }
 
 

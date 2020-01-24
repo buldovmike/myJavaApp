@@ -10,14 +10,20 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import javenue.csv.Csv;
+import ru.nnov.nntc.mbuldov.java.mysql.appdb.ExamMarks;
 import ru.nnov.nntc.mbuldov.java.mysql.appdb.Lecturer;
 import ru.nnov.nntc.mbuldov.java.mysql.appdb.Student;
 
@@ -48,6 +54,8 @@ public class MasterForm extends javax.swing.JFrame {
     public MasterForm() {
         initComponents();
         setLocationRelativeTo(null); // позиционировать форму по центу экрана
+        
+        checkConn();
     }
 
     /**
@@ -59,6 +67,18 @@ public class MasterForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+        jTextFieldDateFrom = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jTextFieldDateTo = new javax.swing.JTextField();
+        jBtnOK = new javax.swing.JButton();
+        jBtnSave = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         menuBar = new javax.swing.JMenuBar();
         mainMenu = new javax.swing.JMenu();
         openStudFormMenuitem = new javax.swing.JMenuItem();
@@ -75,11 +95,108 @@ public class MasterForm extends javax.swing.JFrame {
                 formFocusGained(evt);
             }
         });
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
         });
+
+        jLabel1.setText("Предмет:");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Математика", "Физика", "География", "Химия" }));
+
+        jLabel2.setText("Дата от:");
+
+        jTextFieldDateFrom.setText("01.09.2019");
+        jTextFieldDateFrom.setPreferredSize(new java.awt.Dimension(85, 23));
+
+        jLabel3.setText("Дата по:");
+
+        jTextFieldDateTo.setText("07.09.2019");
+
+        jBtnOK.setText("ОК");
+        jBtnOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnOKActionPerformed(evt);
+            }
+        });
+
+        jBtnSave.setText("Save");
+        jBtnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaveActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(18, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jTextFieldDateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jTextFieldDateTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jBtnOK, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jBtnSave)
+                .addGap(4, 4, 4))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextFieldDateFrom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextFieldDateTo)
+                    .addComponent(jBtnOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jBtnSave))
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(jTable1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
+        );
 
         mainMenu.setMnemonic('f');
         mainMenu.setText("Меню");
@@ -145,11 +262,15 @@ public class MasterForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 579, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -194,6 +315,93 @@ public class MasterForm extends javax.swing.JFrame {
        lectForm.setVisible(true);
     }//GEN-LAST:event_openLectFormMenuitemActionPerformed
 
+    private void jBtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnSaveActionPerformed
+
+    private void jBtnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnOKActionPerformed
+        
+        String[] tHeaders;
+        Object[][] tModel;
+        long dFrom;
+        long dTo;
+        long currentTime;
+        long currentTime2;
+        long milliSecIn24h = 60*60*24*1000;
+        int datesCount;
+        
+        try {
+            dFrom = (long) new SimpleDateFormat("dd.MM.yyyy").parse(jTextFieldDateFrom.getText()).getTime(); 
+            currentTime = dFrom;
+            dTo = (long) new SimpleDateFormat("dd.MM.yyyy").parse(jTextFieldDateTo.getText()).getTime();  
+            datesCount = (int) ((dTo - dFrom)/milliSecIn24h);
+           
+            
+            //System.out.println(datesCount);
+            
+            tHeaders = new String[datesCount+1];
+            
+            tHeaders[0] = "ФИО\\Дата";
+            
+            for(int i=1; i<=datesCount; i++){
+                String pattern = "dd.MM.yyyy";
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                java.util.Date curDate = new java.util.Date(currentTime);
+                String curDateStr = sdf.format(curDate);
+                tHeaders[i] = curDateStr;
+                currentTime+=milliSecIn24h;
+            }
+            
+            tModel = new Object[1][datesCount+1];
+            DefaultTableModel dtm = new DefaultTableModel(tModel, tHeaders);
+            jTable1.setModel(dtm);
+            
+            DefaultTableModel marksModel = (DefaultTableModel) jTable1.getModel();
+            marksModel.setRowCount(0);
+            
+            // запрашиваем всех студентов
+            Query query = this.em.createNamedQuery("Student.findAll");
+            List<Student> resultList = query.getResultList();
+            
+            for(Student result : resultList){
+
+                Object rowData[] = new Object[datesCount+1];
+
+                rowData[0] = result.getSurname() + " " + result.getName() + "("+result.getStudentId()+")";
+                
+                currentTime2 = dFrom;
+                int subjectId = 7; // FIXME: HARDCODE DETECTED!!!
+                
+                for(int i=1; i<=datesCount; i++){
+                    // взять оценки из бд
+                    
+                    String pattern = "yyyy-MM-dd";
+                    SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                    java.util.Date curDate = new java.util.Date(currentTime2);
+                    String curDateStr = sdf.format(curDate);
+                    rowData[i] = getMark(result.getStudentId(), subjectId, curDateStr);
+                    currentTime2+=milliSecIn24h;
+                }
+                
+                marksModel.addRow(rowData);
+
+            }
+            
+            jTable1.getColumnModel().getColumn(0).setPreferredWidth(200);
+            
+            
+            
+            
+        } catch (ParseException ex) {
+            Logger.getLogger(MasterForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_jBtnOKActionPerformed
+
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
+        checkConn();
+    }//GEN-LAST:event_formWindowGainedFocus
+
     /**
      * @param args the command line arguments
      */
@@ -236,6 +444,18 @@ public class MasterForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JButton jBtnOK;
+    private javax.swing.JButton jBtnSave;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextFieldDateFrom;
+    private javax.swing.JTextField jTextFieldDateTo;
     private javax.swing.JMenu mainMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openLectFormMenuitem;
@@ -259,6 +479,37 @@ public class MasterForm extends javax.swing.JFrame {
                     System.err.println(e.toString());
                     return false;
                 }        
+    }
+    
+     public void checkConn(){
+        if(isConnSucess()){
+            // подключение успешно - работаем дальше
+            System.out.println("Успешное подключение к бд");
+        } else {
+            settDialog.setVisible(true);
+        }
+    }
+    
+    private String getMark(int studentId, int subjectId, String dateStr){
+        
+        String studId = String.valueOf(studentId);
+        String subjId = String.valueOf(subjectId);
+        String examDate = dateStr + " 00:00:00";
+        String examDate2 = dateStr + " 23:59:59";
+
+            List<ExamMarks> marks= (List<ExamMarks>) this.em.createNativeQuery(
+                    "SELECT * FROM EXAM_MARKS e WHERE e.STUDENT_ID="
+                            + studId + " AND e.SUBJ_ID="
+                            + subjId + " AND e.EXAM_DATE >= '"+examDate+"' AND e.EXAM_DATE <= '"+examDate2+"'",
+                    ExamMarks.class
+            ).getResultList();
+            
+            if(marks.isEmpty()){
+                return "";
+            }
+            
+            return marks.get(0).getMark().toString();
+            
     }
 
 }
